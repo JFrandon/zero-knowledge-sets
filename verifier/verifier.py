@@ -19,10 +19,10 @@ def modPow(base, exponent, modulus):
 
 
 def verify(sigma, proof):
-    [q, qq, t, tt] = map(lambda x: int(x, 16), json.loads(sigma))
+    [q, qq, t, tt] = map(lambda x: int(x, 16), json.loads(sigma).get("sigma"))
+    pk = json.loads(sigma).get("public")
     p = q * qq + 1
     g = t ** qq % p
-    gg = modPow(t,qq,p)
     h = tt ** qq % p
 
     def p_hash(a, b):
@@ -32,6 +32,8 @@ def verify(sigma, proof):
         return (modPow(g, mv, p) * modPow(hv, rv, p)) % p
 
     proof = json.loads(proof)
+    if proof[0].get("c") != pk:
+        return False
 
     hp = [hex(h)]
     for statement in proof:
